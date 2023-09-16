@@ -4,11 +4,9 @@
  */
 package reproductor;
 
-import com.sun.media.MediaPlayer;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -22,11 +20,7 @@ import javazoom.jl.player.Player;
 import javax.sound.sampled.AudioInputStream;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
-import javax.sound.sampled.LineEvent;
-import javax.sound.sampled.LineListener;
 import java.io.File;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
@@ -48,6 +42,7 @@ public class Reproductor implements ActionListener {
     public Reproductor() {
         vista.setVisible(true);
         añadirActionEvents();
+        ReproductorVista.jLabel4.setText(cancionSeleccionada);
     }
 
     private void añadirActionEvents() {
@@ -62,6 +57,7 @@ public class Reproductor implements ActionListener {
     public void actionPerformed(ActionEvent ae) {
         posicionActual = getBotonPosicionString(ae.getSource());
         cargarCanciones();
+
         if (posicionActual!=null && posicionActual.equals("add")) {
             add();
         }
@@ -70,14 +66,8 @@ public class Reproductor implements ActionListener {
                 play();
             } catch (FileNotFoundException ex) {
                 System.out.println("error");
-            } catch (JavaLayerException ex) {
+            }catch (UnsupportedAudioFileException | IOException | LineUnavailableException | JavaLayerException ex) {
                 System.out.println("Error");
-            } catch (UnsupportedAudioFileException ex) {
-                Logger.getLogger(Reproductor.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (IOException ex) {
-                Logger.getLogger(Reproductor.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (LineUnavailableException ex) {
-                Logger.getLogger(Reproductor.class.getName()).log(Level.SEVERE, null, ex);
             }
             posicionActual=null;
         }
@@ -132,7 +122,10 @@ public class Reproductor implements ActionListener {
                     String song=cancion.toString();
                     if (song.endsWith(".mp3")) {
                       reproductor = new Player(new FileInputStream(rutaCancion));
-                       reproductor.play();                    
+                       reproductor.play();  
+                       if (reproductor.isComplete()) {
+                           reproductor.close();
+                       }
                     } else {
                         File archivoAudio = new File(rutaCancion);
                         AudioInputStream audioInput = AudioSystem.getAudioInputStream(archivoAudio);
@@ -141,6 +134,7 @@ public class Reproductor implements ActionListener {
 
                         clip.open(audioInput);
                         clip.start();  
+                        
                     }                    
                 }
             }
@@ -158,7 +152,11 @@ public class Reproductor implements ActionListener {
                 JOptionPane.showMessageDialog(null, "No hay canción seleccionada");
             }
         } else {
-             clip.stop();
+            if(clip.isRunning()) {
+                clip.stop();
+                
+            }
+             
         }
         
     } 
@@ -181,6 +179,7 @@ public class Reproductor implements ActionListener {
             if (seleccion != null) {
                 cancionSeleccionada = ((Cancion) seleccion).getNombre();
             }
+        ReproductorVista.jLabel4.setText(cancionSeleccionada);
         } else {
             JOptionPane.showMessageDialog(null, "No hay canciones disponibles.");
         }
