@@ -31,8 +31,6 @@ public class ReproductorVista extends javax.swing.JFrame {
         jPanel2 = new javax.swing.JPanel();
         play = new javax.swing.JButton();
         stop = new javax.swing.JButton();
-        siguiente = new javax.swing.JButton();
-        atras = new javax.swing.JButton();
         jPanel3 = new javax.swing.JPanel();
         select = new javax.swing.JButton();
         add = new javax.swing.JButton();
@@ -52,38 +50,23 @@ public class ReproductorVista extends javax.swing.JFrame {
         stop.setBorderPainted(false);
         stop.setContentAreaFilled(false);
 
-        siguiente.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/siguiente.png"))); // NOI18N
-        siguiente.setBorderPainted(false);
-        siguiente.setContentAreaFilled(false);
-
-        atras.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/atras.png"))); // NOI18N
-        atras.setBorderPainted(false);
-        atras.setContentAreaFilled(false);
-
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
-                .addGap(220, 220, 220)
-                .addComponent(atras, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(289, 289, 289)
                 .addComponent(play, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(stop, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(siguiente, javax.swing.GroupLayout.PREFERRED_SIZE, 57, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(207, Short.MAX_VALUE))
+                .addContainerGap(282, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(24, 24, 24)
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(atras)
-                    .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(stop)
-                        .addComponent(siguiente))
+                    .addComponent(stop)
                     .addComponent(play))
                 .addContainerGap(30, Short.MAX_VALUE))
         );
@@ -185,13 +168,11 @@ public class ReproductorVista extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     public static javax.swing.JButton add;
-    public static javax.swing.JButton atras;
     private javax.swing.JPanel jPanel1;
     public static javax.swing.JPanel jPanel2;
     public static javax.swing.JPanel jPanel3;
     public static javax.swing.JButton play;
     public static javax.swing.JButton select;
-    public static javax.swing.JButton siguiente;
     public static javax.swing.JButton stop;
     // End of variables declaration//GEN-END:variables
 }

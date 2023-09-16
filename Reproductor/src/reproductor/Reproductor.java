@@ -8,35 +8,29 @@ import com.sun.media.MediaPlayer;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JFileChooser;
 import javazoom.jl.decoder.JavaLayerException;
-import javazoom.jl.player.advanced.*;
+import javazoom.jl.player.Player;
 
 /**
  *
  * @author dell
  */
 public class Reproductor implements ActionListener {
-    MediaPlayer mediaPlayer = new MediaPlayer();
     ArrayList<Cancion> listaCanciones = new ArrayList<>();
     private String posicionActual;
     ReproductorVista vista = new ReproductorVista();
     private String carpetaCanciones = "AudiosMP3";
     String cancionSeleccionada;
-    AdvancedPlayer reproductor;
+    Player reproductor;
     
     public Reproductor() {
         vista.setVisible(true);
@@ -47,9 +41,7 @@ public class Reproductor implements ActionListener {
         ReproductorVista.add.addActionListener(this);
         ReproductorVista.stop.addActionListener(this);
         ReproductorVista.play.addActionListener(this);
-        ReproductorVista.siguiente.addActionListener(this);
         ReproductorVista.select.addActionListener(this);
-        ReproductorVista.atras.addActionListener(this);
         
     }
     
@@ -57,29 +49,25 @@ public class Reproductor implements ActionListener {
     public void actionPerformed(ActionEvent ae) {
         posicionActual = getBotonPosicionString(ae.getSource());
         cargarCanciones();
-        if (posicionActual.equals("add")) {
+        if (posicionActual!=null && posicionActual.equals("add")) {
             add();
         }
-        if (posicionActual.equals("play")) {
+        if (posicionActual!=null && posicionActual.equals("play")) {
             try {
                 play();
             } catch (FileNotFoundException ex) {
                 System.out.println("error");
             } catch (JavaLayerException ex) {
-                System.out.println("Errir");
+                System.out.println("Error");
             }
+            posicionActual=null;
         }
-        if (posicionActual.equals("stop")) {
+        if (posicionActual!=null && posicionActual.equals("stop")) {
             stop();
+            
         }
-        if (posicionActual.equals("siguiente")) {
-            siguiente();
-        }
-        if (posicionActual.equals("select")) {
+        if (posicionActual!=null && posicionActual.equals("select")) {
             select();
-        }
-        if (posicionActual.equals("atras")) {
-            atras();
         }
     }
 
@@ -120,8 +108,9 @@ public class Reproductor implements ActionListener {
                 if (cancionSeleccionada.equals(cancion.getNombre())) {
                     String rutaCancion = cancion.getRuta();
                     
-                    reproductor = new AdvancedPlayer(new FileInputStream(rutaCancion));
+                    reproductor = new Player(new FileInputStream(rutaCancion));
                     reproductor.play();
+                    
                 }
             }
         } else {
@@ -130,11 +119,12 @@ public class Reproductor implements ActionListener {
     }
 
     private void stop() {
-        
-    }
-
-    private void siguiente() {
-        
+        if (reproductor != null) {
+            reproductor.close();
+            reproductor = null;
+        } else {
+            JOptionPane.showMessageDialog(null, "No hay canción seleccionada");
+        }
     }
 
     private void select() {
@@ -158,10 +148,6 @@ public class Reproductor implements ActionListener {
             JOptionPane.showMessageDialog(null, "No hay canciones disponibles.");
         }
         
-    }
-
-    private void atras() {
-
     }
     
     private void cargarCanciones() {
@@ -195,10 +181,6 @@ public class Reproductor implements ActionListener {
             return "add";
         } else if (boton == ReproductorVista.select) {
             return "select";
-        } else if (boton == ReproductorVista.siguiente) {
-            return "siguiente";
-        }else if (boton == ReproductorVista.atras) {
-            return "atras";
         }
         return null;
     }
@@ -210,19 +192,9 @@ public class Reproductor implements ActionListener {
             return ReproductorVista.play;
         }else if (posicion.equals("stop")) {
             return ReproductorVista.stop;
-        } else if (posicion.equals("siguiente")) {
-            return ReproductorVista.siguiente;
-        } else if (posicion.equals("atras")) {
-            return ReproductorVista.atras;
         } else if (posicion.equals("select")) {
             return ReproductorVista.select;
         }
         return null;
     }
 }
-    
-
-
-/*
-C:\Users\dell\Documents\NetBeansProjects\Reproductor\Reproductor\AudiosMP3\audioCR7.mp3
-*/
