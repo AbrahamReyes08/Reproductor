@@ -82,9 +82,9 @@ public class Reproductor implements ActionListener {
 
     public static void add() {
         JFileChooser fileChooser = new JFileChooser();
-        int result = fileChooser.showOpenDialog(null);
+        int resp = fileChooser.showOpenDialog(null);
 
-        if (result == JFileChooser.APPROVE_OPTION) {
+        if (resp == JFileChooser.APPROVE_OPTION) {
             String filePath = fileChooser.getSelectedFile().getAbsolutePath();
             String nombreCancion = fileChooser.getSelectedFile().getName();
             
@@ -97,7 +97,7 @@ public class Reproductor implements ActionListener {
                 File archivoDestino = new File(carpetaCanciones, nombreCancion);
                 try {
                     Files.copy(Paths.get(filePath), archivoDestino.toPath(), StandardCopyOption.REPLACE_EXISTING);
-
+                    //por si existe
                     Cancion cancion = new Cancion(nombreCancion, archivoDestino.getAbsolutePath());
                     listaCanciones.add(cancion);
                     JOptionPane.showMessageDialog(null, "El audio ha sido agregado");
@@ -204,8 +204,8 @@ public class Reproductor implements ActionListener {
                     String nombreCancion = nombreArchivo.substring(0, puntoIndex);
                     String ext = nombreArchivo.substring(puntoIndex);
                     String rutaCancion = archivo.getAbsolutePath();
-                    String nombreArchivoSalida = nombreCancion + ext;
-                    Cancion cancion = new Cancion(nombreArchivoSalida, rutaCancion);
+                    String nombreCompl = nombreCancion + ext;
+                    Cancion cancion = new Cancion(nombreCompl, rutaCancion);
                     listaCanciones.add(cancion);
                 }
             }
