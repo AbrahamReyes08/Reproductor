@@ -139,26 +139,28 @@ public class Reproductor implements ActionListener {
                 }
             }
         } else {
-            JOptionPane.showMessageDialog(null, "No hay canción seleccionada");
+            JOptionPane.showMessageDialog(null, "No hay audio seleccionada");
         }
     }
 
     public static void stop() {
+        if (cancionSeleccionada!=null) {            
         if (cancionSeleccionada.endsWith(".mp3")) {
             if (reproductor != null) {
             reproductor.close();
             reproductor = null;
             } else {
-                JOptionPane.showMessageDialog(null, "No hay canción seleccionada");
+                JOptionPane.showMessageDialog(null, "No hay audio reproduciendo");
             }
-        } else {
+        } else if (clip!=null) {
             if(clip.isRunning()) {
                 clip.stop();
                 
             }
-             
+        }else {
+                JOptionPane.showMessageDialog(null, "No hay audio reproduciendo");
+            }
         }
-        
     } 
 
 
