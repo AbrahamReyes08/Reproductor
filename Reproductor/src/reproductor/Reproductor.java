@@ -19,18 +19,31 @@ import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javazoom.jl.decoder.JavaLayerException;
 import javazoom.jl.player.Player;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.sound.sampled.LineEvent;
+import javax.sound.sampled.LineListener;
+import java.io.File;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.UnsupportedAudioFileException;
+
 
 /**
  *
  * @author dell
  */
 public class Reproductor implements ActionListener {
-    ArrayList<Cancion> listaCanciones = new ArrayList<>();
+    static ArrayList<Cancion> listaCanciones = new ArrayList<>();
     private String posicionActual;
     ReproductorVista vista = new ReproductorVista();
-    private String carpetaCanciones = "AudiosMP3";
-    String cancionSeleccionada;
-    Player reproductor;
+    private static String carpetaCanciones = "Audios";
+    static String cancionSeleccionada;
+    static Player reproductor;
+    private static boolean detener=false;
+    static Clip clip;
     
     public Reproductor() {
         vista.setVisible(true);
@@ -59,6 +72,12 @@ public class Reproductor implements ActionListener {
                 System.out.println("error");
             } catch (JavaLayerException ex) {
                 System.out.println("Error");
+            } catch (UnsupportedAudioFileException ex) {
+                Logger.getLogger(Reproductor.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(Reproductor.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (LineUnavailableException ex) {
+                Logger.getLogger(Reproductor.class.getName()).log(Level.SEVERE, null, ex);
             }
             posicionActual=null;
         }
@@ -71,7 +90,7 @@ public class Reproductor implements ActionListener {
         }
     }
 
-    private void add() {
+    public static void add() {
         JFileChooser fileChooser = new JFileChooser();
         int result = fileChooser.showOpenDialog(null);
 
@@ -79,7 +98,7 @@ public class Reproductor implements ActionListener {
             String filePath = fileChooser.getSelectedFile().getAbsolutePath();
             String nombreCancion = fileChooser.getSelectedFile().getName();
             
-            if (nombreCancion.toLowerCase().endsWith(".mp3")) {
+            if (nombreCancion.toLowerCase().endsWith(".mp3") || nombreCancion.toLowerCase().endsWith(".wav") ) {
                 File carpeta = new File(carpetaCanciones);
                 if (!carpeta.exists()) {
                     carpeta.mkdirs();
@@ -95,22 +114,34 @@ public class Reproductor implements ActionListener {
                 } catch (IOException e) {
                     System.out.println("Error");
                 }
+            } else {
+            JOptionPane.showMessageDialog(null, "No se guardo el archivo");                
             }
         } else {
-            JOptionPane.showMessageDialog(null, "Este archivo no se puede guardar");
+            JOptionPane.showMessageDialog(null, "No se guardo ningun archivo");
         }
             
     }
 
-    private void play() throws FileNotFoundException, JavaLayerException {
+   public static void play() throws FileNotFoundException, JavaLayerException, UnsupportedAudioFileException, IOException, LineUnavailableException {
         if (cancionSeleccionada != null) {
+            System.out.println(cancionSeleccionada);
             for (Cancion cancion : listaCanciones) {
                 if (cancionSeleccionada.equals(cancion.getNombre())) {
-                    String rutaCancion = cancion.getRuta();
-                    
-                    reproductor = new Player(new FileInputStream(rutaCancion));
-                    reproductor.play();
-                    
+                    String rutaCancion = cancion.getPath();
+                    String song=cancion.toString();
+                    if (song.endsWith(".mp3")) {
+                      reproductor = new Player(new FileInputStream(rutaCancion));
+                       reproductor.play();                    
+                    } else {
+                        File archivoAudio = new File(rutaCancion);
+                        AudioInputStream audioInput = AudioSystem.getAudioInputStream(archivoAudio);
+
+                        clip = AudioSystem.getClip();
+
+                        clip.open(audioInput);
+                        clip.start();  
+                    }                    
                 }
             }
         } else {
@@ -118,16 +149,22 @@ public class Reproductor implements ActionListener {
         }
     }
 
-    private void stop() {
-        if (reproductor != null) {
+    public static void stop() {
+        if (cancionSeleccionada.endsWith(".mp3")) {
+            if (reproductor != null) {
             reproductor.close();
             reproductor = null;
+            } else {
+                JOptionPane.showMessageDialog(null, "No hay canción seleccionada");
+            }
         } else {
-            JOptionPane.showMessageDialog(null, "No hay canción seleccionada");
+             clip.stop();
         }
-    }
+        
+    } 
 
-    private void select() {
+
+    public static void select() {
         Object[] opciones = listaCanciones.toArray();
 
         if (opciones.length > 0) {
@@ -150,24 +187,29 @@ public class Reproductor implements ActionListener {
         
     }
     
-    private void cargarCanciones() {
+   public static void cargarCanciones() {
         listaCanciones.clear();
         File carpeta = new File(carpetaCanciones);
 
         if (carpeta.isDirectory()) {
-            File[] archivos = carpeta.listFiles((dir, nombre) -> nombre.toLowerCase().endsWith(".mp3"));
+            File[] archivos = carpeta.listFiles((dir, nombre) -> {
+                String nombreLowerCase = nombre.toLowerCase();
+                return nombreLowerCase.endsWith(".mp3") || nombreLowerCase.endsWith(".wav");
+            });
 
             if (archivos != null) {
-                for (File archivo : archivos) {
-                    String nombreArchivo = archivo.getName();
-                    int puntoIndex = nombreArchivo.lastIndexOf('.');
-                    if (puntoIndex > 0) {
-                        String nombreCancion = nombreArchivo.substring(0, puntoIndex);
-                        String rutaCancion = archivo.getAbsolutePath();
-                        Cancion cancion = new Cancion(nombreCancion, rutaCancion);
-                        listaCanciones.add(cancion);
-                    }
+            for (File archivo : archivos) {
+                String nombreArchivo = archivo.getName();
+                int puntoIndex = nombreArchivo.lastIndexOf('.');
+                if (puntoIndex > 0) {
+                    String nombreCancion = nombreArchivo.substring(0, puntoIndex);
+                    String ext = nombreArchivo.substring(puntoIndex);
+                    String rutaCancion = archivo.getAbsolutePath();
+                    String nombreArchivoSalida = nombreCancion + ext;
+                    Cancion cancion = new Cancion(nombreArchivoSalida, rutaCancion);
+                    listaCanciones.add(cancion);
                 }
+            }
             }
         }
     }

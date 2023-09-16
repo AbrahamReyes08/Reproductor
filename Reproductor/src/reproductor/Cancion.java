@@ -10,19 +10,19 @@ package reproductor;
  */
 public class Cancion {
     private String nombre;
-    private String ruta;
+    private String path;
 
-    public Cancion(String nombre, String ruta) {
+    public Cancion(String nombre, String path) {
         this.nombre = nombre;
-        this.ruta = ruta;
+        this.path = path;
     }
 
     public String getNombre() {
         return nombre;
     }
 
-    public String getRuta() {
-        return ruta;
+    public String getPath() {
+        return path;
     }
     
     public String toString() {
